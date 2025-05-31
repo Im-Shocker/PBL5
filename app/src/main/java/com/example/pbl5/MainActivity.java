@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         }
         connected = false;
         btnPower.setText("Bật");
+        tvConnect.setText("Trạng thái: ???");
         tvShow.setText("Ký hiệu: Chưa xác định");
     }
 }
