@@ -23,7 +23,7 @@ import com.example.pbl5.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "SpeechReceiver";
-    private static final int PORT = 6000;
+    private static final int PORT = 8000;
 
     // View Binding
     private ActivityMainBinding binding;
