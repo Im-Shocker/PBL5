@@ -1,104 +1,93 @@
 package com.example.pbl5;
 
-
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
+import android.os.Handler;
+import android.speech.tts.TextToSpeech;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.Camera;
-import androidx.camera.core.CameraSelector;
-import androidx.camera.core.ImageAnalysis;
-import androidx.camera.core.Preview;
-import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.camera.view.PreviewView;
-import androidx.core.content.ContextCompat;
-
-import com.google.common.util.concurrent.ListenableFuture;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-
-    private PreviewView previewView;
-    private TextView txtResult;
-    private Button btnDetect, btnToggle;
-
-    private boolean isDetecting = true;
-    private ExecutorService cameraExecutor;
-    private ProcessCameraProvider cameraProvider;
-    private Camera camera;
+    private TextToSpeech tts;
+    private TCPClient tcpClient;
+    private Handler handler;
+    private TextView tvShow, tvConnect;
+    private Button btnPower;
+    private boolean connected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mapping();
-        startCamera();
-
-        btnDetect.setOnClickListener(v -> {
-            if (!isDetecting) {
-                Toast.makeText(MainActivity.this, "Hệ thống đang tắt nhận diện", Toast.LENGTH_SHORT).show();
-                return;
+        tvShow = findViewById(R.id.tvShow);
+        tvConnect = findViewById(R.id.tvConnect);
+        btnPower = findViewById(R.id.btnPower);
+        handler = new Handler(message -> {
+            switch (message.what) {
+                case 0: // Nhận dữ liệu từ server
+                    String data = (String) message.obj;
+                    // Hiển thị dữ liệu lên TextView
+                    tvShow.setText("Dữ liệu từ server: " + data);
+                    speak(data);
+                    break;
+                case 1: // Kết nối thành công
+                    Toast.makeText(this, (String) message.obj, Toast.LENGTH_SHORT).show();
+                    tvConnect.setText("Trạng thái: Đã kết nối");
+                    break;
+                case 2: // Kết nối thất bại
+                    Toast.makeText(this, (String) message.obj, Toast.LENGTH_SHORT).show();
+                    tvConnect.setText("Trạng thái: Không thể kết nối");
+                    break;
             }
-            // Giả lập nhận diện ký hiệu
-            String fakeGesture = "A";
-            txtResult.setText("Ký hiệu: " + fakeGesture);
+            return true;
         });
 
-        btnToggle.setOnClickListener(v -> {
-            isDetecting = !isDetecting;
-            String status = isDetecting ? "Bật nhận diện" : "Tắt nhận diện";
-            Toast.makeText(MainActivity.this, status, Toast.LENGTH_SHORT).show();
+        tts = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                tts.setLanguage(Locale.forLanguageTag("vi-VN"));
+            }
+        });
+        btnPower.setOnClickListener(v -> {
+            if (!connected) {
+                startConnection();
+            } else {
+                stopConnection();
+            }
         });
     }
-
-    private void mapping() {
-        previewView = findViewById(R.id.cam_nhan_dien);
-        txtResult = findViewById(R.id.tv_ky_hieu);
-        btnDetect = findViewById(R.id.btn_nhan_dien);
-        btnToggle = findViewById(R.id.btn_bat_tat);
-        cameraExecutor = Executors.newSingleThreadExecutor();
-    }
-
-    private void startCamera() {
-        ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
-                ProcessCameraProvider.getInstance(this);
-
-        cameraProviderFuture.addListener(() -> {
-            try {
-                cameraProvider = cameraProviderFuture.get();
-
-                Preview preview = new Preview.Builder().build();
-                CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
-
-                preview.setSurfaceProvider(previewView.getSurfaceProvider());
-
-                ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                        .build();
-
-
-
-                cameraProvider.unbindAll();
-                camera = cameraProvider.bindToLifecycle(
-                        this, cameraSelector, preview, imageAnalysis);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, ContextCompat.getMainExecutor(this));
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (cameraExecutor != null) {
-            cameraExecutor.shutdown();
+    private void speak(String text) {
+        if (tts != null && !tts.isSpeaking()) {
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null, "UTTERANCE_ID");
         }
     }
+    @Override
+    protected void onDestroy() {
+        connected = false;
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+    private void startConnection() {
+        tcpClient = new TCPClient(handler);
+        tcpClient.start();
+        connected = true;
+        btnPower.setText("Tắt");
+        tvConnect.setText("Đang kết nối...");
+    }
+
+    private void stopConnection() {
+        if (tcpClient != null) {
+            tcpClient.close();
+            tcpClient = null;
+        }
+        connected = false;
+        btnPower.setText("Bật");
+        tvShow.setText("Ký hiệu: Chưa xác định");
+    }
 }
+
