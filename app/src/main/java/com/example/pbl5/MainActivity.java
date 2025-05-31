@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     // Data và logic
-    private ArrayList<String> history = new ArrayList<>();
+    private final ArrayList<String> history = new ArrayList<>();
     private HistoryAdapter historyAdapter;
     private TextToSpeech tts;
     private ServerSocket serverSocket;
@@ -74,11 +74,11 @@ public class MainActivity extends AppCompatActivity {
                     tts.setLanguage(Locale.US);
                 }
                 Log.i(TAG, "TextToSpeech đã sẵn sàng");
-                updateStatusMessage("🎤 Hệ thống phát âm đã sẵn sàng", false);
+                updateStatusMessage("Hệ thống phát âm đã sẵn sàng", false);
             } else {
                 Log.e(TAG, "Khởi tạo TextToSpeech thất bại");
                 showToast("Không thể khởi tạo chức năng đọc văn bản");
-                updateStatusMessage("❌ Lỗi khởi tạo hệ thống phát âm", true);
+                updateStatusMessage("Lỗi khởi tạo hệ thống phát âm", true);
             }
         });
     }
@@ -164,8 +164,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Server đang lắng nghe trên port " + PORT);
 
                 runOnUiThread(() -> {
-                    showToast("🚀 Server đã khởi động trên port " + PORT);
-                    updateStatusMessage("🌐 Server đang chạy - Port: " + PORT + "\n📱 Chờ kết nối từ Raspberry Pi...", false);
+                    showToast("Server đã khởi động trên port " + PORT);
+                    updateStatusMessage("Server đang chạy - Port: " + PORT + "\nChờ kết nối từ Raspberry Pi...", false);
                 });
 
                 while (isServerRunning && !Thread.currentThread().isInterrupted()) {
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
                         // Hiển thị thông tin kết nối với animation
                         runOnUiThread(() -> {
-                            String connectionInfo = "🔗 Đã kết nối với: " + clientSocket.getInetAddress() + "\n⏳ Đang chờ dữ liệu...";
+                            String connectionInfo = " Đã kết nối với: " + clientSocket.getInetAddress() + "\nĐang chờ dữ liệu...";
                             updateStatusMessage(connectionInfo, false);
                         });
 
@@ -192,8 +192,8 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 Log.e(TAG, "Lỗi khởi tạo server: " + e.getMessage());
                 runOnUiThread(() -> {
-                    showToast("❌ Không thể khởi động server");
-                    updateStatusMessage("❌ Lỗi server: " + e.getMessage(), true);
+                    showToast(" Không thể khởi động server");
+                    updateStatusMessage("Lỗi server: " + e.getMessage(), true);
                 });
             }
         });
@@ -224,14 +224,14 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.e(TAG, "Lỗi đọc dữ liệu từ client: " + e.getMessage());
             runOnUiThread(() -> {
-                updateStatusMessage("⚠️ Mất kết nối với client", true);
+                updateStatusMessage("Mất kết nối với client", true);
             });
         } finally {
             try {
                 clientSocket.close();
                 Log.i(TAG, "Đã đóng kết nối client");
                 runOnUiThread(() -> {
-                    updateStatusMessage("📱 Chờ kết nối mới từ Raspberry Pi...", false);
+                    updateStatusMessage("Chờ kết nối mới từ Raspberry Pi...", false);
                 });
             } catch (IOException e) {
                 Log.e(TAG, "Lỗi đóng kết nối client: " + e.getMessage());
@@ -247,8 +247,8 @@ public class MainActivity extends AppCompatActivity {
         String timestampedMessage = getCurrentTimestamp() + " 🔸 " + message;
         history.add(0, timestampedMessage);
 
-        // Giới hạn lịch sử (giữ tối đa 50 tin nhắn)
-        if (history.size() > 50) {
+        // Giới hạn lịch sử (giữ tối đa 200 tin nhắn)
+        if (history.size() > 200) {
             history.remove(history.size() - 1);
         }
 
@@ -275,16 +275,16 @@ public class MainActivity extends AppCompatActivity {
             // Thêm pause ngắn trước khi đọc
             String speakText = message;
             tts.speak(speakText, TextToSpeech.QUEUE_FLUSH, null, "message_id");
-            Log.d(TAG, "🔊 Đang đọc: " + message);
+            Log.d(TAG, "Đang đọc: " + message);
 
             // Cập nhật UI để hiển thị đang đọc
             runOnUiThread(() -> {
-                updateStatusMessage("🔊 Đang phát: " + message, false);
+                updateStatusMessage("Đang phát: " + message, false);
             });
         } else {
             Log.w(TAG, "TTS chưa sẵn sàng");
             runOnUiThread(() -> {
-                updateStatusMessage("⚠️ Hệ thống phát âm chưa sẵn sàng", true);
+                updateStatusMessage("Hệ thống phát âm chưa sẵn sàng", true);
             });
         }
     }
@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
         // Dọn dẹp binding
         binding = null;
 
-        Log.i(TAG, "🧹 Ứng dụng đã được dọn dẹp hoàn toàn");
+        Log.i(TAG, "Ứng dụng đã được dọn dẹp hoàn toàn");
     }
 
     @Override
