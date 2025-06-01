@@ -9,6 +9,7 @@ android {
     defaultConfig {
         applicationId = "com.example.pbl5"
         minSdk = 28
+        //noinspection OldTargetApi
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -34,6 +35,8 @@ android {
 }
 
 dependencies {
+
+    implementation ("com.google.android.material:material:1.11.0")
     implementation ("androidx.camera:camera-camera2:1.2.3")
     implementation ("androidx.camera:camera-lifecycle:1.2.3")
     implementation ("androidx.camera:camera-view:1.2.3")
