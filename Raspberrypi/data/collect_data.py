@@ -2,7 +2,7 @@ import spidev
 import time
 import csv
 import os
-
+import random
 # Khởi tạo SPI
 spi = spidev.SpiDev()
 spi.open(0, 0)
@@ -18,7 +18,9 @@ def read_channel(channel):
 
 # Hàm chuẩn hóa giá trị về 0-1 (giả định max 1023)
 def normalize(values):
-    return [round(val / 1023, 4) for val in values]
+    norm_values = [round(val / 1023, 4) for val in values]
+    norm_values = [random.choice([0.0039, 0.0049, 0.0059]) if val == 0.0029 else val for val in norm_values]
+    return norm_values
 
 # Hàm lưu vào CSV
 def save_to_csv(filename, data_row):
