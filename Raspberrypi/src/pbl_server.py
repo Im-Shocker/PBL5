@@ -52,6 +52,16 @@ except Exception as e:
     print("Lỗi khi đọc label_map:", e)
     sys.exit(1)
 
+# Load file json chứa từ hợp lệ và từ hiển thị
+try:
+    with open('/home/pi/PBL/data/valid_word.json', 'r', encoding='utf-8') as f:
+        valid_words_map = json.load(f)
+        valid_words_set = set(valid_words_map.keys())  # Dùng để kiểm tra hợp lệ
+except Exception as e:
+    print("Lỗi khi load valid_word.json:", e)
+    sys.exit(1)
+
+
 # ----------- Firebase Admin SDK -----------
 try:
     cred = credentials.Certificate('/home/pi/serviceAccountKey.json')
@@ -112,29 +122,52 @@ def predict_with_min_max_check(raw_data, scaler, model, label_map, debug=False):
     return prediction_label, confidence
 
 def update_text_firebase():
-    text_ref = db.reference('raspberry_pi/text')
+    char_ref = db.reference('raspberry_pi/text')  # Gửi từng ký tự
+    word_ref = db.reference('raspberry_pi/word')  # Gửi nguyên từ khi gặp "0"
     last_prediction = None
+    full_text = ""
 
     while True:
         try:
+            # Đọc dữ liệu từ 5 cảm biến
             raw_data = [read_channel(i) for i in range(5)]
             if any(val == -1 for val in raw_data):
                 print("[ERROR] Dữ liệu cảm biến không hợp lệ:", raw_data)
-                time.sleep(2.5)
+                time.sleep(2)
                 continue
 
+            # Dự đoán ký tự
             message, confidence = predict_with_min_max_check(raw_data, scaler, model, label_map, debug=True)
 
+            # Kiểm tra điều kiện gửi
             if message != "Không xác định" and message != last_prediction and confidence >= 70:
-                text_ref.set(message)
+                print(f"[PREDICTED] {message} ({confidence}%)")
+                if message == "0":
+                    char_ref.set("0")  # VẪN gửi số 0 để client xử lý
+                    word = full_text.strip().lower()
+                    if word:
+                        if word in valid_words_set:
+                            word_vietnamese = valid_words_map[word]
+                            word_ref.set(word_vietnamese)
+                            print("[UPLOAD] Đã gửi từ:", word_vietnamese)
+                        else:
+                            print("[WARNING] Từ không hợp lệ, KHÔNG gửi:", word)
+                    full_text = ""  # Reset từ đã ghép
+
+                else:
+                    # Gửi từng ký tự bình thường
+                    full_text += message
+                    char_ref.set(message)
+                    print("[SEND] Ký tự:", message)
+
                 last_prediction = message
-                print("[SUCCESS] Cập nhật text lên Firebase:", message, f"({confidence}%)")
             else:
-                print(f"[INFO] Không cập nhật Firebase. Label: {message} | Confidence: {confidence}%")
+                print(f"[INFO] Không cập nhật. Label: {message} | Confidence: {confidence}%")
 
         except Exception as e:
             print("[ERROR] Không thể cập nhật text:", e)
-        time.sleep(2.5)
+
+        time.sleep(2)
 
 if __name__ == "__main__":
     try:

@@ -20,11 +20,12 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private TextToSpeech tts;
-    private TextView tvShow, tvConnect;
+    private TextView tvShow, tvConnect, tvWord;
     private Button btnPower;
     private boolean listening = false;
     private DatabaseReference dataRef;
-
+    private DatabaseReference dataWord;
+    private String currentWord = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         tvShow = findViewById(R.id.tvShow);
+        tvWord = findViewById(R.id.tvWord);
         tvConnect = findViewById(R.id.tvConnect);
         btnPower = findViewById(R.id.btnPower);
         FirebaseApp.initializeApp(this);
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         dataRef = FirebaseDatabase.getInstance().getReference("raspberry_pi/text");
+        dataWord = FirebaseDatabase.getInstance().getReference("raspberry_pi/word");
 
         btnPower.setOnClickListener(v -> {
             if (!listening) {
@@ -51,19 +54,33 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    private final ValueEventListener wordListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            String word = snapshot.getValue(String.class);
+            if (word != null && !word.isEmpty()) {
+                tvWord.setText("Từ: " + word);
+                speak(word);
+            }
+        }
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+            Log.e("Firebase", "Error reading word: " + error.getMessage());
+        }
+    };
     private void startListening() {
         listening = true;
-        tvConnect.setText("Đang lắng nghe Firebase...");
+        tvConnect.setText("Đang dịch ...");
         btnPower.setText("Tắt");
         dataRef.addValueEventListener(firebaseListener);
+        dataWord.addValueEventListener(wordListener);
     }
 
     private void stopListening() {
         listening = false;
         tvConnect.setText("Đã ngắt kết nối");
         btnPower.setText("Bật");
-
+        tvShow.setText("Ký hiệu: ???");
         dataRef.removeEventListener(firebaseListener);
     }
 
@@ -73,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
             String value = snapshot.getValue(String.class);
             if (value != null) {
                 tvShow.setText("Ký hiệu: " + value);
-                speak(value);
+                currentWord = value;
+                if(!currentWord.equals("0"))
+                    speak(value);
             }
         }
 
