@@ -35,5 +35,16 @@ Xử lý dữ liệu và huấn luyện mô hình ( bằng XGBoost - Extreme Gra
     -Xử lý dữ liệu và đọc văn bản thành giọng nói:
         Sử dụng TextToSpeech để chuyển nội dung nhận dạng sang giọng nói tiếng Việt.
 
+tài liệu thap khảo 
+[1] K. Sharma, P. Jain, and S. Sharma, "A Review on Systems-Based Sensory Gloves for Sign Language Recognition State of the Art between 2007 and 2017," Sensors, vol. 18, no. 7, p. 2208, 2018. [Online]. Available: https://www.mdpi.com/1424-8220/18/7/2208
+[2] H. Fan et al., "AI enabled sign language recognition and VR space bidirectional communication using triboelectric smart glove," Nature Communications, vol. 12, article 5637, 2021. [Online]. Available: https://www.nature.com/articles/s41467-021-25637-w
+[3] M. Quinn, "Sign-language: Android application which uses feature extraction algorithms and machine learning (SVM) to recognise and translate static sign language gestures," GitHub Repository, 2024. [Online]. Available: https://github.com/Mquinn960/sign-language
+[4] Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. Deep Learning. MIT Press, 2016. [Online]. Available: https://www.deeplearningbook.org/
+[5] google database, filebase : 
+https://firebase.google.com/?authuser=1
+[6] "Sign Language MNIST Dataset," Kaggle, October 2017. [Online]. Available: https://www.kaggle.com/datasets/datamunge/sign-language-mnist
+[7] Koch, G., Zemel, R., & Salakhutdinov, R. (2015). "Siamese Neural Networks for One-shot Image Recognition," in ICML Deep Learning Workshop, 2015.
+[8]Raspberry Pi Foundation. (n.d.). Raspberry Pi 4 Model B. Retrieved from: https://www.raspberrypi.com/products/raspberry-pi-4-model-b/
+[9]Google Developers. (n.d.). Android Developer Guide. Retrieved from: https://developer.android.com/guide
 
         
