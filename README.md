@@ -14,3 +14,24 @@ Thu thập dữ liệu :
 Xử lý dữ liệu và huấn luyện mô hình ( bằng XGBoost - Extreme Gradient Boosting)
     - chạy file "train_model.py" để xử lý dữ liệu và huấn luyện mô hình"
     - 
+2.Phần mềm.
+    - Ứng dụng Android "AppAdroid"
+    - Mục tiêu của ứng dụng :
+      •	  Kết nối với server qua HTTPS (REST API) để nhận dữ liệu ký hiệu.
+      •	  Hiển thị nội dung ký hiệu dưới dạng văn bản trên giao diện người dùng.
+      •	  Đọc to nội dung ký hiệu bằng tiếng Việt để người nghe có thể hiểu.
+      •	  Giao diện thân thiện, dễ sử dụng cho cả người bình thường và người khiếm thính/ngôn.
+
+    - Khởi tạo dự án :
+        Tạo project với cấu trúc chuẩn theo mô hình MVVM.
+        Cấu hình minSdk và targetSdk phù hợp với thiết bị sử dụng thực tế (API 30 trở lên).
+        Cài đặt các thư viện cần thiết.
+    -Thiết kế giao diện : 	Sử dụng ConstraintLayout để tạo giao diện linh hoạt.
+    -Cấu hình và sử dụng HTTPS (REST API):
+        Sử dụng thư viện firebase_admin để thiết lập và duy trì kết nối HTTPS (REST API).
+        Dữ liệu ký hiệu được nhận từ server dưới dạng chuỗi JSON, sau đó được giải mã bằng Gson.
+    -Xử lý dữ liệu và đọc văn bản thành giọng nói:
+        Sử dụng TextToSpeech để chuyển nội dung nhận dạng sang giọng nói tiếng Việt.
+
+
+        
