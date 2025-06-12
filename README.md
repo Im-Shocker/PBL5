@@ -26,7 +26,9 @@ Xử lý dữ liệu và huấn luyện mô hình ( bằng XGBoost - Extreme Gra
         Tạo project với cấu trúc chuẩn theo mô hình MVVM.
         Cấu hình minSdk và targetSdk phù hợp với thiết bị sử dụng thực tế (API 30 trở lên).
         Cài đặt các thư viện cần thiết.
+      
     -Thiết kế giao diện : 	Sử dụng ConstraintLayout để tạo giao diện linh hoạt.
+    
     -Cấu hình và sử dụng HTTPS (REST API):
         Sử dụng thư viện firebase_admin để thiết lập và duy trì kết nối HTTPS (REST API).
         Dữ liệu ký hiệu được nhận từ server dưới dạng chuỗi JSON, sau đó được giải mã bằng Gson.
